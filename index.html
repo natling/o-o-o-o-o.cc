@@ -1,0 +1,212 @@
+<!-- words by dj / o@o-o-o-o-o.cc -->
+<!-- website by natalie / natalie.computer -->
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:fb="http://ogp.me/ns/fb#">
+
+<head>
+  <meta property="og:title" content="o-o-o-o"/>
+  <meta property="og:image" content="o-o-o-o-o.cc/stuff/preview.jpg"/>
+  <meta property="og:url" content="o-o-o-o-o.cc"/>
+  <title>o-o-o-o</title>
+  <meta charset="UTF-8">
+  <link rel="shortcut icon" href="stuff/favicon.png"/>
+  <style>
+    @font-face {
+      font-family: 'Menlo';
+      font-style: normal;
+      src:
+        local('Menlo'),
+        local('Menlo Regular'),
+        url('stuff/menlo.otf') format("opentype");
+    }
+
+    body {
+      margin: 0;
+      text-align: center;
+      transition: background-color 10s;
+    }
+
+    .label {
+      display: inline-block;
+      padding: 10px;
+    }
+
+    .modalBackground {
+      display: none;
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 1s, background-color 1s;
+    }
+
+    .modalContent {
+      position: absolute;
+      padding: 10px;
+      overflow: auto;
+      transform: scale(0, 0);
+      transition: transform 1s;
+    }
+
+    p {
+      margin: 0px;
+      line-height: 120%;
+      color: white;
+      font-family: Menlo, monospace;
+      font-size: 12px;
+    }
+
+    p.body {
+      padding: 10px;
+      text-align: justify;
+    }
+
+    .header {
+      text-align: right;
+      padding: 10px;
+    }
+
+    ::-webkit-scrollbar {
+      width: 0px;
+      height: 0px;
+      background: transparent;
+    }
+  </style>
+</head>
+
+<body>
+</body>
+
+<script src="stuff/randomColor.min.js"></script>
+<script src="stuff/base-notes.js"></script>
+
+<script>
+  function randomIntegerInclusive(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function getRandomFloat(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  function shuffleArray(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var temp = array[i];
+      array[i] = array[j];
+      array[j] = temp;
+    }
+    return array;
+  }
+
+  function cycleBodyBackgroundColor() {
+    document.body.style.backgroundColor = randomColor({luminosity: 'dark'});
+    setTimeout(cycleBodyBackgroundColor, getRandomFloat(10, 20) * 1000);
+  }
+
+  cycleBodyBackgroundColor();
+
+  var width  = window.innerWidth;
+  var height = window.innerHeight;
+
+  var margin = 50;
+
+  var labelContainer = document.createElement('div');
+  labelContainer.id  = 'labelContainer';
+  document.body.appendChild(labelContainer);
+
+  var modalContainer = document.createElement('div');
+  modalContainer.id  = 'modalContainer';
+  document.body.appendChild(modalContainer);
+
+  data = shuffleArray(data);
+
+  for (var i = 0; i < data.length; i++) {
+    (function(i) {
+      var label = document.createElement('div');
+
+      var header = document.createElement('div');
+      header.className = 'header';
+      label.appendChild(header);
+
+      var artist   = document.createElement('p');
+      var song     = document.createElement('p');
+      var album    = document.createElement('p');
+      var year     = document.createElement('p');
+      var duration = document.createElement('p');
+
+      artist.innerHTML   = data[i].artist;
+      song.innerHTML     = data[i].song;
+      album.innerHTML    = '<i>' + data[i].album + '</i>';
+      year.innerHTML     = data[i].year;
+      duration.innerHTML = data[i].duration;
+
+      header.appendChild(artist);
+      header.appendChild(song);
+      header.appendChild(album);
+      header.appendChild(year);
+      header.appendChild(duration);
+
+      label.style.margin          = randomIntegerInclusive(10, 60) + 'px';
+      label.style.backgroundColor = randomColor({hue: 'monochrome', luminosity: 'dark'});
+      label.className             = 'label';
+
+      labelContainer.appendChild(label);
+
+      var modalContent    = label.cloneNode(true);
+      var modalBackground = document.createElement('div');
+
+      var text = document.createElement('div');
+      text.innerHTML = data[i].text;
+      modalContent.appendChild(text);
+
+      modalContent.style.backgroundColor    = randomColor({hue: 'monochrome', luminosity: 'dark'});
+      modalContent.style.margin             = '0px';
+      modalContent.className                = 'modalContent';
+      modalBackground.style.backgroundColor = randomColor({luminosity: 'dark'});
+      modalBackground.className             = 'modalBackground';
+
+      modalBackground.appendChild(modalContent);
+      modalContainer.appendChild(modalBackground);
+
+      label.onclick = function() {
+        modalBackground.style.display = 'block';
+
+        if (modalContent.clientWidth >= width - margin * 2) {
+          modalContent.style.width = '400px';
+        }
+
+        if (modalContent.clientHeight >= height - margin * 2) {
+          modalContent.style.height = '400px';
+        }
+
+        var modalWidth  = modalContent.clientWidth;
+        var modalHeight = modalContent.clientHeight;
+        var modalLeft   = getRandomFloat(margin, width - modalWidth - margin);
+        var modalTop    = getRandomFloat(margin, height - modalHeight - margin);
+
+        modalContent.style.left       = modalLeft + 'px';
+        modalContent.style.top        = modalTop + 'px';
+        modalContent.style.transform  = 'scale(1, 1)';
+        modalBackground.style.opacity = '1';
+      }
+
+      modalBackground.onclick = function() {
+        modalContent.style.transform  = 'scale(0, 0)';
+        modalBackground.style.opacity = '0';
+
+        setTimeout(function() {
+          modalBackground.style.display = 'none';
+        }, 1000);
+      }
+    })(i);
+  }
+</script>
+
+</html>
